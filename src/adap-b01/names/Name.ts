@@ -6,36 +6,63 @@ export class Name {
     private components: string[] = [];
     private delimiter: string = this.DEFAULT_DELIMITER;
 
+    /**
+     * @InitializationMethod
+     */
     constructor(other: string[], delimiter?: string) {
-        throw new Error("needs implementation");
+        if (delimiter) {
+            this.delimiter = delimiter;
+        }
+        this.components = other;
     }
 
+    /**
+     * @ConversionMethod
+     */
     public asNameString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation");
+        return this.components.join(delimiter);
     }
-
+    
+    /**
+     * @GetMethod
+     */
     public getComponent(i: number): string {
-        throw new Error("needs implementation");
+        return this.components[i];
     }
 
+    /**
+     * @SetMethod
+     */
     public setComponent(i: number, c: string): void {
-        throw new Error("needs implementation");
+        this.components[i] = c;
     }
 
+    /**
+     * @GetMethod
+     */
     public getNoComponents(): number {
-        throw new Error("needs implementation");
+        return this.components.length;
     }
 
+    /**
+     * @CommandMethod
+     */
     public insert(i: number, c: string): void {
-        throw new Error("needs implementation");
+        this.components.splice(i, 0, c);
     }
 
+    /**
+     * @CommandMethod
+     */
     public append(c: string): void {
-        throw new Error("needs implementation");
+        this.components.push(c);
     }
 
+    /**
+     * @CommandMethod
+     */
     public remove(i: number): void {
-        throw new Error("needs implementation");
+        this.components.splice(i, 1);
     }
 
 }
