@@ -18,7 +18,8 @@ export class Name {
 
     /**
      * @ConversionMethod
-     */
+     *
+     * Returns human-readable representation of Name instance */
     public asNameString(delimiter: string = this.delimiter): string {
         return this.components.join(delimiter);
     }
