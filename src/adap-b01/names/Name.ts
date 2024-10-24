@@ -7,7 +7,7 @@ export class Name {
     private delimiter: string = this.DEFAULT_DELIMITER;
 
     /**
-     * @InitializationMethod
+     * @methodtype initialization-method
      */
     constructor(other: string[], delimiter?: string) {
         if (delimiter) {
@@ -17,7 +17,7 @@ export class Name {
     }
 
     /**
-     * @ConversionMethod
+     * @methodtype conversion-method
      *
      * Returns human-readable representation of Name instance */
     public asNameString(delimiter: string = this.delimiter): string {
@@ -25,42 +25,42 @@ export class Name {
     }
     
     /**
-     * @GetMethod
+     * @methodtype get-method 
      */
     public getComponent(i: number): string {
         return this.components[i];
     }
 
     /**
-     * @SetMethod
+     * @methodtype set-method
      */
     public setComponent(i: number, c: string): void {
         this.components[i] = c;
     }
 
     /**
-     * @GetMethod
+     * @methodtype get-method 
      */
     public getNoComponents(): number {
         return this.components.length;
     }
 
     /**
-     * @CommandMethod
+     * @methodtype command-method
      */
     public insert(i: number, c: string): void {
         this.components.splice(i, 0, c);
     }
 
     /**
-     * @CommandMethod
+     * @methodtype command-method
      */
     public append(c: string): void {
         this.components.push(c);
     }
 
     /**
-     * @CommandMethod
+     * @methodtype command-method
      */
     public remove(i: number): void {
         this.components.splice(i, 1);
