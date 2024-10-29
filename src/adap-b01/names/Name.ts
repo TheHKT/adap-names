@@ -41,7 +41,8 @@ export class Name {
     /**
      * @methodtype get-method 
      */
-    public getNoComponents(): number {
+     /** Returns number of components in Name instance */
+     public getNoComponents(): number {
         return this.components.length;
     }
 
