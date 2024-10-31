@@ -12,19 +12,23 @@ export class StringName implements Name {
             this.delimiter = delimiter;
         }
         this.name = other;
-        this.setLength(this.name.length);
+        this.doSetLength(this.doGetName().length);
     }
 
     public asString(delimiter: string = this.delimiter): string {
-        return this.getName().replace(new RegExp(`[${ESCAPE_CHARACTER}${delimiter}]`, 'g'), match => ESCAPE_CHARACTER + match);
+        return this.toArray().map(component => this.addEscapeCharacters(component, delimiter)).join(delimiter);
     }
 
     public asDataString(): string {
         return this.asString(this.getDelimiterCharacter());
     }
 
+    private addEscapeCharacters(s: string, delimiter: string): string {
+        return s.replace(new RegExp(`[${ESCAPE_CHARACTER}${delimiter}]`, 'g'), match => ESCAPE_CHARACTER + match);
+    }
+
     public isEmpty(): boolean {
-        return this.getLength() === 0;
+        return this.doGetLength() === 0;
     }
 
     public getDelimiterCharacter(): string {
@@ -43,29 +47,29 @@ export class StringName implements Name {
         let arr: string[] = this.toArray();
         arr[n] = c;
         let str: string = arr.join(this.delimiter);
-        this.setLength(str.length);
-        this.setName(str);
+        this.doSetLength(str.length);
+        this.doSetName(str);
     }
 
     public insert(n: number, c: string): void {
         let arr: string[] = this.toArray();
         arr.splice(n, 0, c);
         let str: string = arr.join(this.delimiter);
-        this.setLength(str.length);
-        this.setName(str);
+        this.doSetLength(str.length);
+        this.doSetName(str);
     }
 
     public append(c: string): void {
-        this.setName(this.name + this.delimiter + c);
-        this.setLength(this.name.length);
+        this.doSetName(this.name + this.delimiter + c);
+        this.doSetLength(this.name.length);
     }
 
     public remove(n: number): void {
         let arr: string[] = this.toArray();
         arr.splice(n, 1);
         let str: string = arr.join(this.delimiter);
-        this.setLength(str.length);
-        this.setName(str);
+        this.doSetLength(str.length);
+        this.doSetName(str);
     }
 
     public concat(other: Name): void {
@@ -78,6 +82,22 @@ export class StringName implements Name {
         const regexEscapedDelimiter = this.getDelimiterCharacter().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const rx = new RegExp(`(?<!\\${ESCAPE_CHARACTER})${regexEscapedDelimiter}`, "g");
         return this.name.split(rx);
+    }
+
+    protected doSetLength(n: number): void {
+        this.setLength(n);
+    }
+
+    protected doGetLength(): number {
+        return this.getLength();
+    }
+
+    protected doSetName(n: string): void {
+        this.setName(n);
+    }
+
+    protected doGetName(): string {
+        return this.getName();
     }
 
     public setLength(n: number): void {
