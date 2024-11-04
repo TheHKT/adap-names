@@ -13,19 +13,43 @@ export class StringArrayName implements Name {
     }
 
     public asString(delimiter: string = this.delimiter): string {
-        return this.components.map(component => this.addEscapeCharacters(component, delimiter)).join(delimiter);
+        return this.components.join(this.getDelimiter());
     }
 
     public asDataString(): string {
-        return this.asString(this.getDelimiterCharacter());
+        return this.components.map(component => this.addEscapeCharacters(component, this.getDelimiter())).join(this.getDelimiter());
     }
 
     private addEscapeCharacters(s: string, delimiter: string): string {
         return s.replace(new RegExp(`[${ESCAPE_CHARACTER}${delimiter}]`, 'g'), match => ESCAPE_CHARACTER + match);
     }
 
+    private removeEscapeCharacters(s: string): string {
+        let buff: string = "Ǽ"; // \. or \\.
+        let masked: string = s.replaceAll(this.getDelimiter() + this.getDelimiter(), buff);
+        return masked.replaceAll(this.getDelimiter(), "").replaceAll(buff, this.getDelimiter());
+    }
+
     public isEmpty(): boolean {
         return this.components.length === 0;
+    }
+
+    public insert(i: number, c: string): void {
+        this.components.splice(i, 0, this.removeEscapeCharacters(c));
+    }
+
+    public append(c: string): void {
+        this.components.push(this.removeEscapeCharacters(c));
+    }
+
+    public remove(i: number): void {
+        this.components.splice(i, 1);
+    }
+
+    public concat(other: Name): void {
+        for(let i = 0; i<other.getNoComponents(); i++){
+            this.append(other.getComponent(i));
+        }
     }
 
     public getDelimiterCharacter(): string {
@@ -41,25 +65,10 @@ export class StringArrayName implements Name {
     }
 
     public setComponent(i: number, c: string): void {
-        this.components[i] = c;
+        this.components[i] = this.removeEscapeCharacters(c);
     }
 
-    public insert(i: number, c: string): void {
-        this.components.splice(i, 0, c);
+    public getDelimiter(): string {
+        return this.delimiter;
     }
-
-    public append(c: string): void {
-        this.components.push(c);
-    }
-
-    public remove(i: number): void {
-        this.components.splice(i, 1);
-    }
-
-    public concat(other: Name): void {
-        for(let i = 0; i<other.getNoComponents(); i++){
-            this.append(other.getComponent(i));
-        }
-    }
-
 }
