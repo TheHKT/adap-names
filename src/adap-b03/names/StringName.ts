@@ -15,7 +15,6 @@ export class StringName extends AbstractName {
     getNoComponents(): number {
         return this.toArray().length;
     }
-
     private toArray(): string[] {
         const regexEscapedDelimiter = this.getDelimiterCharacter().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const rx = new RegExp(`(?<!\\${ESCAPE_CHARACTER})${regexEscapedDelimiter}`, "g");
@@ -55,7 +54,6 @@ export class StringName extends AbstractName {
     private getName(): string {
         return this.name;
     }
-
     private setName(name: string) {
         this.name = name;
     }
