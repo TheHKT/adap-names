@@ -7,28 +7,61 @@ export class StringName extends AbstractName {
     protected length: number = 0;
 
     constructor(other: string, delimiter?: string) {
-        super();
-        throw new Error("needs implementation");
+        super(delimiter);
+        this.name = other;
+        this.length = this.getName().length;
     }
 
     getNoComponents(): number {
-        throw new Error("needs implementation");
+        return this.toArray().length;
+    }
+
+    private toArray(): string[] {
+        const regexEscapedDelimiter = this.getDelimiterCharacter().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const rx = new RegExp(`(?<!\\${ESCAPE_CHARACTER})${regexEscapedDelimiter}`, "g");
+        return this.getName().split(rx);
     }
 
     getComponent(i: number): string {
-        throw new Error("needs implementation");
+        return this.toArray()[i];
     }
     setComponent(i: number, c: string) {
-        throw new Error("needs implementation");
+        let arr: string[] = this.toArray();
+        arr[i] = c;
+        let str: string = arr.join(this.getDelimiterCharacter());
+        this.setLength(str.length);
+        this.setName(str);
     }
 
     insert(i: number, c: string) {
-        throw new Error("needs implementation");
+        let arr: string[] = this.toArray();
+        arr.splice(i, 0, c);
+        let str: string = arr.join(this.getDelimiterCharacter());
+        this.setLength(str.length);
+        this.setName(str);
     }
     append(c: string) {
-        throw new Error("needs implementation");
+        this.setName(this.getName() + this.getDelimiterCharacter() + c);
+        this.setLength(this.getName().length);
     }
     remove(i: number) {
-        throw new Error("needs implementation");
+        let arr: string[] = this.toArray();
+        arr.splice(i, 1);
+        let str: string = arr.join(this.getDelimiterCharacter());
+        this.setLength(str.length);
+        this.setName(str);
     }
+
+    private getName(): string {
+        return this.name;
+    }
+
+    private setName(name: string) {
+        this.name = name;
+    }
+
+    private setLength(length: number) {
+        this.length = length;
+    }
+
 }
