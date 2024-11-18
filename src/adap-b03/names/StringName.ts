@@ -1,10 +1,11 @@
-import { Name, DEFAULT_DELIMITER, ESCAPE_CHARACTER } from "./Name";
+import { DEFAULT_DELIMITER, ESCAPE_CHARACTER } from "../common/Printable";
+import { Name } from "./Name";
 import { AbstractName } from "./AbstractName";
 
 export class StringName extends AbstractName {
 
     protected name: string = "";
-    protected length: number = 0;
+    protected noComponents: number = 0;
 
     constructor(other: string, delimiter?: string) {
         super(delimiter);
@@ -61,5 +62,6 @@ export class StringName extends AbstractName {
     private setLength(length: number) {
         this.length = length;
     }
+
 
 }
