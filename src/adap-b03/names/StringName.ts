@@ -10,7 +10,7 @@ export class StringName extends AbstractName {
     constructor(other: string, delimiter?: string) {
         super(delimiter);
         this.name = other;
-        this.length = this.getName().length;
+        this.noComponents = this.getName().length;
     }
 
     getNoComponents(): number {
@@ -60,7 +60,7 @@ export class StringName extends AbstractName {
     }
 
     private setLength(length: number) {
-        this.length = length;
+        this.noComponents = length;
     }
 
 

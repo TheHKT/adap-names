@@ -8,68 +8,60 @@ export class StringName extends AbstractName {
     protected noComponents: number = 0;
 
     constructor(other: string, delimiter?: string) {
-        super();
-        throw new Error("needs implementation");
-    }
-
-    public clone(): Name {
-        throw new Error("needs implementation");
-    }
-
-    public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation");
-    }
-
-    public toString(): string {
-        throw new Error("needs implementation");
-    }
-
-    public asDataString(): string {
-        throw new Error("needs implementation");
-    }
-
-    public isEqual(other: Name): boolean {
-        throw new Error("needs implementation");
-    }
-
-    public getHashCode(): number {
-        throw new Error("needs implementation");
-    }
-
-    public isEmpty(): boolean {
-        throw new Error("needs implementation");
-    }
-
-    public getDelimiterCharacter(): string {
-        throw new Error("needs implementation");
+        super(delimiter);
+        this.name = other;
+        this.noComponents = this.toArray().length;
     }
 
     public getNoComponents(): number {
-        throw new Error("needs implementation");
+        return this.noComponents;
+    }
+    private setNoComponents(noComponents: number) {
+        this.noComponents = noComponents;
+    }
+    private toArray(): string[] {
+        const regexEscapedDelimiter = this.getDelimiterCharacter().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const rx = new RegExp(`(?<!\\${ESCAPE_CHARACTER})${regexEscapedDelimiter}`, "g");
+        return this.getName().split(rx);
     }
 
     public getComponent(i: number): string {
-        throw new Error("needs implementation");
+        return this.toArray()[i];
     }
 
     public setComponent(i: number, c: string) {
-        throw new Error("needs implementation");
+        let arr: string[] = this.toArray();
+        arr[i] = c;
+        let str: string = arr.join(this.getDelimiterCharacter());
+        this.setNoComponents(arr.length);
+        this.setName(str);
     }
 
     public insert(i: number, c: string) {
-        throw new Error("needs implementation");
+        let arr: string[] = this.toArray();
+        arr.splice(i, 0, c);
+        let str: string = arr.join(this.getDelimiterCharacter());
+        this.setNoComponents(arr.length);
+        this.setName(str);
     }
 
     public append(c: string) {
-        throw new Error("needs implementation");
+        this.setName(this.getName() + this.getDelimiterCharacter() + c);
+        this.setNoComponents(this.getNoComponents() + 1);
     }
 
     public remove(i: number) {
-        throw new Error("needs implementation");
+        let arr: string[] = this.toArray();
+        arr.splice(i, 1);
+        let str: string = arr.join(this.getDelimiterCharacter());
+        this.setNoComponents(arr.length);
+        this.setName(str);
     }
 
-    public concat(other: Name): void {
-        throw new Error("needs implementation");
+    private getName(): string {
+        return this.name;
     }
-
+    private setName(name: string) {
+        this.name = name;
+    }
 }
