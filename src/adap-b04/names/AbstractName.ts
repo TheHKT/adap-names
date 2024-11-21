@@ -20,7 +20,6 @@ export abstract class AbstractName implements Name {
 
         // POST
         this.assertValidDelimiter(new MethodFailureException("Could not execute constructor!"), delimiter);
-
         // CLASS INV
         this.assertValidState();
     }
@@ -34,13 +33,12 @@ export abstract class AbstractName implements Name {
         // POST
         this.assertSuccessfulClone(clone);
 
-        return { ...this };
+        return clone;
     }
 
     public asString(delimiter: string = this.getDelimiterCharacter()): string {
         // CLASS INV
         this.assertValidState();
-
         // PRE
         this.assertValidDelimiter(new IllegalArgumentException("Delimiter must be a single character!"), delimiter);
 
@@ -100,7 +98,6 @@ export abstract class AbstractName implements Name {
     public isEqual(other: Name): boolean {
         // CLASS INV
         this.assertValidState();
-
         // PRE
         this.assertValidNameInstance(new IllegalArgumentException("Name is null!"), other);
 
@@ -164,32 +161,36 @@ export abstract class AbstractName implements Name {
     public concat(other: Name): void {
         // CLASS INV
         this.assertValidState();
-
         // PRE
         this.assertValidNameInstance(new IllegalArgumentException("Name is null!"), other);
+        // Cloning old state for post condition
+        let clone: Name = this.clone();
 
         for (let i = 0; i < other.getNoComponents(); i++) {
             this.append(other.getComponent(i));
         }
 
         // POST
-        this.assertValidNameInstance(new IllegalArgumentException("Name is null!"), this);
+        try {
+            this.assertValidNameInstance(new MethodFailureException("Name is null!"), this);
+        } catch (e: any) {
+            Object.assign(this, clone);
+            throw e;
+        }
     }
 
     protected assertValidState(): void {
-        this.getComponents().forEach(component => {
-            this.assertEscapedString(new InvalidStateException("Component contains unescaped delimiter character!"), component);
-        });
         this.assertValidDelimiter(new InvalidStateException("Delimiter must be a single character!"));
     }
     protected assertEscapedString(exception: Exception, component: string): void {
         this.assertValidString(exception, component);
-        const regex = new RegExp(`(?<!${ESCAPE_CHARACTER})${this.getDelimiterCharacter}`, 'g');
+        const regex =
+            new RegExp(`(?<!${ESCAPE_CHARACTER.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')})${this.delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')}`, 'g');
         if (regex.test(component)) {
             throw exception;
         }
     }
-    protected assertValidDelimiter(exception: Exception, delimiter: string = this.getDelimiterCharacter()): void {
+    protected assertValidDelimiter(exception: Exception, delimiter: string = this.delimiter): void {
         this.assertValidString(exception, delimiter);
         if (delimiter.length !== 1) {
             throw exception;
@@ -197,7 +198,8 @@ export abstract class AbstractName implements Name {
     }
     protected assertUnescapedString(exception: Exception, component: string): void {
         this.assertValidString(exception, component);
-        const regex = new RegExp(`(?<=${ESCAPE_CHARACTER})${this.getDelimiterCharacter}`, 'g');
+        const regex =
+            new RegExp(`(?<=${ESCAPE_CHARACTER.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')})${this.delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')}`, 'g');
         if (regex.test(component)) {
             throw exception;
         }
