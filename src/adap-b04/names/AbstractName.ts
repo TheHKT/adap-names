@@ -1,4 +1,3 @@
-import { Exception } from "../common/Exception";
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
 import { InvalidStateException } from "../common/InvalidStateException";
 import { MethodFailureException } from "../common/MethodFailureException";
@@ -11,7 +10,7 @@ export abstract class AbstractName implements Name {
 
     constructor(delimiter: string = DEFAULT_DELIMITER) {
         // PRE
-        this.assertValidDelimiter(new IllegalArgumentException("Delimiter must be a single character and not null!"), delimiter);
+        this.assertValidDelimiter(IllegalArgumentException, delimiter);
 
         if (delimiter)
             this.delimiter = delimiter;
@@ -19,28 +18,28 @@ export abstract class AbstractName implements Name {
             this.delimiter = DEFAULT_DELIMITER;
 
         // POST
-        this.assertValidDelimiter(new MethodFailureException("Could not execute constructor!"), delimiter);
+        this.assertValidDelimiter(MethodFailureException, delimiter);
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
     }
 
     public clone(): Name {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
 
         let clone: Name = { ...this };
 
         // POST
-        this.assertSuccessfulClone(clone);
-
+        MethodFailureException.assertIsNotNullOrUndefined(clone, "Could not execute clone()!");
+        MethodFailureException.assertCondition(this !== clone, "Clone is not a deep copy.");
         return clone;
     }
 
     public asString(delimiter: string = this.getDelimiterCharacter()): string {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
         // PRE
-        this.assertValidDelimiter(new IllegalArgumentException("Delimiter must be a single character!"), delimiter);
+        this.assertValidDelimiter(IllegalArgumentException, delimiter);
 
         let str: string[] = this.getComponents();
         let length: number = this.getNoComponents();
@@ -50,7 +49,7 @@ export abstract class AbstractName implements Name {
         let result = str.join(delimiter);
 
         // POST
-        this.assertUnescapedString(new MethodFailureException("String has escaped delimiters!"), result);
+        this.assertUnescapedString(MethodFailureException, result);
         return result;
     }
 
@@ -62,12 +61,12 @@ export abstract class AbstractName implements Name {
 
     public toString(): string {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
 
         let str: string = this.getComponents().join(this.getDelimiterCharacter());
 
         // POST
-        this.assertValidString(new MethodFailureException("Could not execute toString()!"), str);
+        MethodFailureException.assertIsNotNullOrUndefined(str, "Could not execute toString()!");
 
         return str;
     }
@@ -75,12 +74,12 @@ export abstract class AbstractName implements Name {
     // We assume that delimiter inside a component is escaped with ESCAPE_CHARACTER
     public asDataString(): string {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
 
         let str: string = this.toString();
 
         // POST
-        this.assertValidString(new MethodFailureException("Could not execute asDataString()!"), str);
+        MethodFailureException.assertIsNotNullOrUndefined(str, "Could not execute asDataString()!");
 
         return str;
     }
@@ -97,20 +96,21 @@ export abstract class AbstractName implements Name {
 
     public isEqual(other: Name): boolean {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
         // PRE
-        this.assertValidNameInstance(new IllegalArgumentException("Name is null!"), other);
+        IllegalArgumentException.assertIsNotNullOrUndefined(other, "Name is null!");
 
         let flag: boolean = this.toString() == other.toString();
 
         // POST 
-        this.assertValidBoolean(new MethodFailureException("Could not execute isEqual()!"), flag);
+        MethodFailureException.assertIsNotNullOrUndefined(flag, "Could not execute isEqual()!");
+
         return flag;
     }
 
     public getHashCode(): number {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
 
         let hashCode: number = 0;
         const s: string = this.toString();
@@ -121,31 +121,32 @@ export abstract class AbstractName implements Name {
         }
 
         // POST
-        this.assertValidHashCode(new MethodFailureException("Could not execute isEqual()!"), hashCode);
+        MethodFailureException.assertIsNotNullOrUndefined(hashCode, "Could not execute getHashCode()!");
 
         return hashCode;
     }
 
     public isEmpty(): boolean {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
 
         let flag: boolean = this.getComponents().length === 0;
 
         // POST 
-        this.assertValidBoolean(new MethodFailureException("Could not execute isEmpty()!"), flag);
+        MethodFailureException.assertIsNotNullOrUndefined(flag, "Could not execute isEmpty()!");
 
         return flag;
     }
 
     public getDelimiterCharacter(): string {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
 
         let str: string = this.delimiter;
 
         // PRE
-        this.assertValidDelimiter(new MethodFailureException("Could not execute getDelimiterCharacter()!"));
+        MethodFailureException.assertIsNotNullOrUndefined(str, "Could not execute getDelimiterCharacter()!");
+
         return str;
     }
 
@@ -160,9 +161,10 @@ export abstract class AbstractName implements Name {
 
     public concat(other: Name): void {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
         // PRE
-        this.assertValidNameInstance(new IllegalArgumentException("Name is null!"), other);
+        IllegalArgumentException.assertIsNotNullOrUndefined(other, "Name is null!");
+
         // Cloning old state for post condition
         let clone: Name = this.clone();
 
@@ -172,79 +174,41 @@ export abstract class AbstractName implements Name {
 
         // POST
         try {
-            this.assertValidNameInstance(new MethodFailureException("Name is null!"), this);
+            MethodFailureException.assertIsNotNullOrUndefined(this, "Could not execute concat()!");
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
         }
     }
 
-    protected assertValidState(): void {
-        this.assertValidDelimiter(new InvalidStateException("Delimiter must be a single character!"));
+    protected ensureInvariants(): void {
+        InvalidStateException.assertIsNotNullOrUndefined(this.delimiter, "Delimiter must not be null!");
+        InvalidStateException.assertCondition(this.delimiter.length === 1, "Delimiter must be a single character!");
     }
-    protected assertEscapedString(exception: Exception, component: string): void {
-        this.assertValidString(exception, component);
-        const regex =
-            new RegExp(`(?<!${ESCAPE_CHARACTER.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')})${this.delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')}`, 'g');
-        if (regex.test(component)) {
-            throw exception;
-        }
+    protected assertEscapedString(exceptionClass: any, component: string): void {
+        exceptionClass.assertIsNotNullOrUndefined(component, "String must not be null!");
+        const regex = new RegExp(`(?<!${ESCAPE_CHARACTER.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')})${this.delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')}`, 'g');
+        exceptionClass.assertCondition(!regex.test(component), "String is not valid unescaped!");
     }
-    protected assertValidDelimiter(exception: Exception, delimiter: string = this.delimiter): void {
-        this.assertValidString(exception, delimiter);
-        if (delimiter.length !== 1) {
-            throw exception;
-        }
+    protected assertUnescapedString(exceptionClass: any, component: string): void {
+        exceptionClass.assertIsNotNullOrUndefined(component, "String must not be null!");
+        const regex = new RegExp(`(?<=${ESCAPE_CHARACTER.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')})${this.delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')}`, 'g');
+        exceptionClass.assertCondition(!regex.test(component), "String is escaped!");
     }
-    protected assertUnescapedString(exception: Exception, component: string): void {
-        this.assertValidString(exception, component);
-        const regex =
-            new RegExp(`(?<=${ESCAPE_CHARACTER.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')})${this.delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')}`, 'g');
-        if (regex.test(component)) {
-            throw exception;
-        }
+    protected assertValidDelimiter(exceptionClass: any, delimiter: string = this.delimiter): void {
+        exceptionClass.assertIsNotNullOrUndefined(delimiter, "Delimiter must not be null!");
+        exceptionClass.assertCondition(delimiter.length === 1, "Delimiter must be a single character!");
     }
-    protected assertSuccessfulClone(clone: Name): void {
-        this.assertValidNameInstance(new MethodFailureException("Clone is null."), clone);
-        if (this === clone) {
-            throw new MethodFailureException("Clone is not a deep copy.");
-        }
+    protected assertValidIndex(exceptionClass: any, i: number) {
+        exceptionClass.assertIsNotNullOrUndefined(i, "Index must not be null!");
+        exceptionClass.assertCondition(i < this.getNoComponents(), "Index must be positive!");
     }
-    protected assertValidString(exception: Exception, s: string): void {
-        if (s == null) {
-            throw exception;
-        }
+    protected assertValidRemoval(exceptionClass: any, oldNoComponents: number) {
+        exceptionClass.assertIsNotNullOrUndefined(this.getNoComponents(), "Failed removing component!");
+        exceptionClass.assertCondition(oldNoComponents - 1 === this.getNoComponents(), "Failed removing component!");
     }
-    protected assertValidNameInstance(exception: Exception, name: Name): void {
-        if (name == null) {
-            throw exception;
-        }
-    }
-    protected assertValidBoolean(exception: Exception, b: boolean): void {
-        if (b == null) {
-            throw exception;
-        }
-    }
-    protected assertValidHashCode(exception: Exception, hashCode: number): void {
-        if (hashCode == null) {
-            throw exception;
-        }
-    }
-
-    protected assertValidIndex(e: Exception, i: number) {
-        this.assertValidNumber(e, i);
-        if (i >= this.getNoComponents()) {
-            throw e;
-        }
-    }
-    protected assertValidNumber(exception: Exception, num: number): void {
-        if (num == null || num < 0) {
-            throw exception;
-        }
-    }
-    protected assertSuccessfulRemoval(exception: Exception, oldNoComponents: number): void {
-        if (oldNoComponents == this.getNoComponents()) {
-            throw exception;
-        }
+    protected assertValidComponentAddition(exceptionClass: any, index: number, oldNoComponents: number) {
+        exceptionClass.assertCondition(this.getNoComponents() === oldNoComponents + 1, "Failed adding component!");
+        this.assertEscapedString(exceptionClass, this.getComponent(index));
     }
 }

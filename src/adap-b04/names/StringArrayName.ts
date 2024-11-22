@@ -2,8 +2,6 @@ import { Name } from "./Name";
 import { AbstractName } from "./AbstractName";
 import { MethodFailureException } from "../common/MethodFailureException";
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
-import { Exception } from "../common/Exception";
-import { InvalidStateException } from "../common/InvalidStateException";
 
 export class StringArrayName extends AbstractName {
 
@@ -12,48 +10,48 @@ export class StringArrayName extends AbstractName {
     constructor(other: string[], delimiter?: string) {
         super(delimiter);
         // PRE
-        this.assertValidComponents(new IllegalArgumentException("No valid array given!"), other);
+        this.assertValidComponents(IllegalArgumentException, other);
 
         this.components = other;
 
         // POST
-        this.assertValidComponents(new MethodFailureException("Failed executing constructor!"), this.components);
+        this.assertValidComponents(MethodFailureException, this.components);
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
     }
 
     public getNoComponents(): number {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
 
         let length: number = this.components.length;
 
         // POST
-        this.assertValidNumber(new MethodFailureException("Failed executing getNoComponents()!"), length);
+        MethodFailureException.assertIsNotNullOrUndefined(length, "Failed executing getNoComponents()!");
 
         return length;
     }
 
     public getComponent(i: number): string {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
         // PRE
-        this.assertValidIndex(new IllegalArgumentException("No valid index given!"), i);
+        this.assertValidIndex(IllegalArgumentException, i);
 
         let str = this.components[i];
 
         // POST
-        this.assertEscapedString(new MethodFailureException("String is not valid (null or unescaped)!"), str);
+        this.assertEscapedString(MethodFailureException, str);
 
         return str;
     }
 
     public setComponent(i: number, c: string) {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
         // PRE
-        this.assertValidIndex(new IllegalArgumentException("No valid index given!"), i);
-        this.assertEscapedString(new IllegalArgumentException("String is not valid (null or unescaped)!"), c);
+        this.assertValidIndex(IllegalArgumentException, i);
+        this.assertEscapedString(IllegalArgumentException, c);
         // Cloning old state for post condition
         let clone: Name = this.clone();
 
@@ -61,7 +59,7 @@ export class StringArrayName extends AbstractName {
 
         // POST
         try {
-            this.assertValidString(new MethodFailureException("Failed setting component!"), this.components[i]);
+            this.assertEscapedString(MethodFailureException, this.components[i]);
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
@@ -70,18 +68,19 @@ export class StringArrayName extends AbstractName {
 
     public insert(i: number, c: string) {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
         // PRE
-        this.assertValidIndex(new IllegalArgumentException("No valid index given!"), i);
-        this.assertEscapedString(new IllegalArgumentException("String is not valid (null or unescaped)!"), c);
+        this.assertValidIndex(IllegalArgumentException, i);
+        this.assertEscapedString(IllegalArgumentException, c);
         // Cloning old state for post condition
         let clone: Name = this.clone();
+        let oldNoComponents = this.getNoComponents();
 
         this.components.splice(i, 0, c);
 
         // POST
         try {
-            this.assertValidString(new MethodFailureException("Failed inserting component!"), this.getComponent(i));
+            this.assertValidComponentAddition(MethodFailureException, i, oldNoComponents);
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
@@ -90,17 +89,18 @@ export class StringArrayName extends AbstractName {
 
     public append(c: string) {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
         // PRE
-        this.assertEscapedString(new IllegalArgumentException("String is not valid (null or unescaped)!"), c);
+        this.assertEscapedString(IllegalArgumentException, c);
         // Cloning old state for post condition
         let clone: Name = this.clone();
+        let oldNoComponents = this.getNoComponents();
 
         this.components.push(c);
 
         // POST
         try {
-            this.assertValidString(new MethodFailureException("Failed appending component!"), this.getComponent(this.getNoComponents() - 1));
+            this.assertValidComponentAddition(MethodFailureException, this.getNoComponents() - 1, oldNoComponents);
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
@@ -109,33 +109,32 @@ export class StringArrayName extends AbstractName {
 
     public remove(i: number) {
         // CLASS INV
-        this.assertValidState();
+        this.ensureInvariants();
         // PRE
-        this.assertValidIndex(new IllegalArgumentException("No valid index given!"), i);
+        this.assertValidIndex(IllegalArgumentException, i);
         // Cloning old state for post condition
         let clone: Name = this.clone();
-
         let oldNoComponents = this.getNoComponents();
+
         this.components.splice(i, 1);
 
         // POST
         try {
-            this.assertSuccessfulRemoval(new MethodFailureException("Failed removing component!"), oldNoComponents);
+            this.assertValidRemoval(MethodFailureException, oldNoComponents);
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
         }
     }
-    protected assertValidState(): void {
-        super.assertValidState();
-        //this.assertValidComponents(new InvalidStateException("Components are not valid!"), this.components);
+
+    protected ensureInvariants(): void {
+        super.ensureInvariants();
+        //this.assertValidComponents(InvalidStateException, this.components);
     }
-    private assertValidComponents(exception: Exception, arr: string[]) {
-        if (arr == null) {
-            throw exception;
-        }
-        for (let i = 0; i < arr.length; i++) {
-            this.assertEscapedString(exception, arr[i]);
-        }
+    private assertValidComponents(exceptionClass: any, arr: string[]) {
+        exceptionClass.assertIsNotNullOrUndefined(arr, "Array must not be null!");
+        arr.forEach((element: string) => {
+            this.assertEscapedString(exceptionClass, element);
+        });
     }
 }
