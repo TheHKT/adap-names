@@ -1,6 +1,6 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
 import { InvalidStateException } from "../common/InvalidStateException";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { Name } from "../names/Name";
 import { Directory } from "./Directory";
 
@@ -24,8 +24,8 @@ export class Node {
         this.parentNode.add(this);
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(this.baseName, "Base name is null or undefined.");
-        MethodFailureException.assertIsNotNullOrUndefined(this.parentNode, "Parent node is null or undefined.");
+        MethodFailedException.assertIsNotNullOrUndefined(this.baseName, "Base name is null or undefined.");
+        MethodFailedException.assertIsNotNullOrUndefined(this.parentNode, "Parent node is null or undefined.");
 
         // CLASS INV
         this.ensureInvariants();
@@ -45,7 +45,7 @@ export class Node {
 
         // POST
         try {
-            MethodFailureException.assertCondition(this.getParentNode() === to, "Node was not moved to destination.");
+            MethodFailedException.assertCondition(this.getParentNode() === to, "Node was not moved to destination.");
         } catch (exception: any) {
             Object.assign(this, clone);
             throw exception;
@@ -60,7 +60,7 @@ export class Node {
         result.append(this.getBaseName());
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(result, "Result was null");
+        MethodFailedException.assertIsNotNullOrUndefined(result, "Result was null");
 
         return result;
     }
@@ -72,7 +72,7 @@ export class Node {
         let res: string = this.doGetBaseName();
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(res, "Result was null");
+        MethodFailedException.assertIsNotNullOrUndefined(res, "Result was null");
 
         return res
     }
@@ -84,7 +84,7 @@ export class Node {
         let res: string = this.baseName;
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(res, "Result was null");
+        MethodFailedException.assertIsNotNullOrUndefined(res, "Result was null");
 
         return res;
     }
@@ -99,7 +99,7 @@ export class Node {
         this.doSetBaseName(bn);
         // POST
         try {
-            MethodFailureException.assertIsNotNullOrUndefined(this.baseName);
+            MethodFailedException.assertIsNotNullOrUndefined(this.baseName);
         } catch (exception: any) {
             Object.assign(this, clone);
             throw exception;
@@ -117,8 +117,8 @@ export class Node {
 
         //POST
         try {
-        MethodFailureException.assertIsNotNullOrUndefined(this.baseName, "Bn null");
-        } catch (exception : any) {
+            MethodFailedException.assertIsNotNullOrUndefined(this.baseName, "Bn null");
+        } catch (exception: any) {
             Object.assign(this, clone);
             throw exception;
         }
@@ -128,10 +128,10 @@ export class Node {
         // CLASS INV
         this.ensureInvariants();
 
-        let res : Directory = this.parentNode;
+        let res: Directory = this.parentNode;
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(res, "ParentNode is null");
+        MethodFailedException.assertIsNotNullOrUndefined(res, "ParentNode is null");
 
         return res;
     }
@@ -142,7 +142,7 @@ export class Node {
     }
 
     protected clone(): Node {
-        return {...this};
+        return { ...this };
     }
 
 }
