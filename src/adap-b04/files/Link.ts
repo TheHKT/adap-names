@@ -1,7 +1,7 @@
 import { Node } from "./Node";
 import { Directory } from "./Directory";
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 
 export class Link extends Node {
 
@@ -18,8 +18,8 @@ export class Link extends Node {
             this.targetNode = tn;
         }
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(bn, "bn is null");
-        MethodFailureException.assertIsNotNullOrUndefined(pn, "pn is null");
+        MethodFailedException.assertIsNotNullOrUndefined(bn, "bn is null");
+        MethodFailedException.assertIsNotNullOrUndefined(pn, "pn is null");
 
         // CLASS INV
         this.ensureInvariants();
@@ -44,7 +44,7 @@ export class Link extends Node {
     
         // POST
         try {
-            MethodFailureException.assertIsNotNullOrUndefined(this.targetNode, "targetNode is null")
+            MethodFailedException.assertIsNotNullOrUndefined(this.targetNode, "targetNode is null")
         } catch (exception: any) {
             Object.assign(this, clone);
             throw exception;
@@ -60,7 +60,7 @@ export class Link extends Node {
         let res = this.getBaseName();
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(res, "res is null");
+        MethodFailedException.assertIsNotNullOrUndefined(res, "res is null");
 
         return res;
     }
@@ -78,7 +78,7 @@ export class Link extends Node {
 
         // POST
         try {
-            MethodFailureException.assertIsNotNullOrUndefined(target);
+            MethodFailedException.assertIsNotNullOrUndefined(target);
         } catch (exception:any) {
             Object.assign(this, clone);
             throw exception;
@@ -92,7 +92,7 @@ export class Link extends Node {
         const result: Node = this.targetNode as Node;
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(result, "result is null");
+        MethodFailedException.assertIsNotNullOrUndefined(result, "result is null");
         return result;
     }
 }

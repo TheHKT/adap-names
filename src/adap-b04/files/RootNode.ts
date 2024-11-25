@@ -1,5 +1,5 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { Name } from "../names/Name";
 import { StringName } from "../names/StringName";
 import { Directory } from "./Directory";
@@ -12,7 +12,7 @@ export class RootNode extends Directory {
         let res = this.ROOT_NODE;
 
         //POST
-        MethodFailureException.assertIsNotNullOrUndefined(res, "res is null");
+        MethodFailedException.assertIsNotNullOrUndefined(res, "res is null");
 
         return res;
     }
@@ -29,7 +29,7 @@ export class RootNode extends Directory {
         let res = new StringName("", '/');
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(res);
+        MethodFailedException.assertIsNotNullOrUndefined(res);
         return res;
     }
 

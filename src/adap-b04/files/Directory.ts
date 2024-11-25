@@ -1,5 +1,5 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { Node } from "./Node";
 
 export class Directory extends Node {
@@ -14,8 +14,8 @@ export class Directory extends Node {
         super(bn, pn);
 
         // POST 
-        MethodFailureException.assertIsNotNullOrUndefined(bn, "bn is null");
-        MethodFailureException.assertIsNotNullOrUndefined(pn, "pn is null");
+        MethodFailedException.assertIsNotNullOrUndefined(bn, "bn is null");
+        MethodFailedException.assertIsNotNullOrUndefined(pn, "pn is null");
 
         // CLASS INV
         this.ensureInvariants();
@@ -33,7 +33,7 @@ export class Directory extends Node {
 
         // POST
         try {
-            MethodFailureException.assertIsNotNullOrUndefined(this.childNodes);
+            MethodFailedException.assertIsNotNullOrUndefined(this.childNodes);
         } catch (exception: any) {
             Object.assign(this, clone);
             throw exception;
@@ -52,7 +52,7 @@ export class Directory extends Node {
 
         // POST
         try {
-            MethodFailureException.assertIsNotNullOrUndefined(this.childNodes);
+            MethodFailedException.assertIsNotNullOrUndefined(this.childNodes);
         } catch (exception: any) {
             Object.assign(this, clone);
             throw exception;
