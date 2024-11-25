@@ -38,7 +38,7 @@ export class Name {
      * Users can vary the delimiter character to be used
      */
     public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation");
+        throw new Error("needs implementation or deletion");
     }
 
     /** 
