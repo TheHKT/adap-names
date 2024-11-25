@@ -1,6 +1,6 @@
 import { Name } from "./Name";
 import { AbstractName } from "./AbstractName";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
 
 export class StringArrayName extends AbstractName {
@@ -15,7 +15,7 @@ export class StringArrayName extends AbstractName {
         this.components = other;
 
         // POST
-        this.assertValidComponents(MethodFailureException, this.components);
+        this.assertValidComponents(MethodFailedException, this.components);
         // CLASS INV
         this.ensureInvariants();
     }
@@ -27,7 +27,7 @@ export class StringArrayName extends AbstractName {
         let length: number = this.components.length;
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(length, "Failed executing getNoComponents()!");
+        MethodFailedException.assertIsNotNullOrUndefined(length, "Failed executing getNoComponents()!");
 
         return length;
     }
@@ -41,7 +41,7 @@ export class StringArrayName extends AbstractName {
         let str = this.components[i];
 
         // POST
-        this.assertEscapedString(MethodFailureException, str);
+        this.assertEscapedString(MethodFailedException, str);
 
         return str;
     }
@@ -59,7 +59,7 @@ export class StringArrayName extends AbstractName {
 
         // POST
         try {
-            this.assertEscapedString(MethodFailureException, this.components[i]);
+            this.assertEscapedString(MethodFailedException, this.components[i]);
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
@@ -80,7 +80,7 @@ export class StringArrayName extends AbstractName {
 
         // POST
         try {
-            this.assertValidComponentAddition(MethodFailureException, i, oldNoComponents);
+            this.assertValidComponentAddition(MethodFailedException, i, oldNoComponents);
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
@@ -100,7 +100,7 @@ export class StringArrayName extends AbstractName {
 
         // POST
         try {
-            this.assertValidComponentAddition(MethodFailureException, this.getNoComponents() - 1, oldNoComponents);
+            this.assertValidComponentAddition(MethodFailedException, this.getNoComponents() - 1, oldNoComponents);
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
@@ -120,7 +120,7 @@ export class StringArrayName extends AbstractName {
 
         // POST
         try {
-            this.assertValidRemoval(MethodFailureException, oldNoComponents);
+            this.assertValidRemoval(MethodFailedException, oldNoComponents);
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;

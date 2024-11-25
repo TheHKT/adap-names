@@ -1,6 +1,6 @@
 import { IllegalArgumentException } from "../common/IllegalArgumentException";
 import { InvalidStateException } from "../common/InvalidStateException";
-import { MethodFailureException } from "../common/MethodFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 import { DEFAULT_DELIMITER, ESCAPE_CHARACTER } from "../common/Printable";
 import { Name } from "./Name";
 
@@ -18,7 +18,7 @@ export abstract class AbstractName implements Name {
             this.delimiter = DEFAULT_DELIMITER;
 
         // POST
-        this.assertValidDelimiter(MethodFailureException, delimiter);
+        this.assertValidDelimiter(MethodFailedException, delimiter);
         // CLASS INV
         this.ensureInvariants();
     }
@@ -30,8 +30,8 @@ export abstract class AbstractName implements Name {
         let clone: Name = { ...this };
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(clone, "Could not execute clone()!");
-        MethodFailureException.assertCondition(this !== clone, "Clone is not a deep copy.");
+        MethodFailedException.assertIsNotNullOrUndefined(clone, "Could not execute clone()!");
+        MethodFailedException.assertCondition(this !== clone, "Clone is not a deep copy.");
         return clone;
     }
 
@@ -49,7 +49,7 @@ export abstract class AbstractName implements Name {
         let result = str.join(delimiter);
 
         // POST
-        this.assertUnescapedString(MethodFailureException, result);
+        this.assertUnescapedString(MethodFailedException, result);
         return result;
     }
 
@@ -66,7 +66,7 @@ export abstract class AbstractName implements Name {
         let str: string = this.getComponents().join(this.getDelimiterCharacter());
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(str, "Could not execute toString()!");
+        MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute toString()!");
 
         return str;
     }
@@ -79,7 +79,7 @@ export abstract class AbstractName implements Name {
         let str: string = this.toString();
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(str, "Could not execute asDataString()!");
+        MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute asDataString()!");
 
         return str;
     }
@@ -103,7 +103,7 @@ export abstract class AbstractName implements Name {
         let flag: boolean = this.toString() == other.toString();
 
         // POST 
-        MethodFailureException.assertIsNotNullOrUndefined(flag, "Could not execute isEqual()!");
+        MethodFailedException.assertIsNotNullOrUndefined(flag, "Could not execute isEqual()!");
 
         return flag;
     }
@@ -121,7 +121,7 @@ export abstract class AbstractName implements Name {
         }
 
         // POST
-        MethodFailureException.assertIsNotNullOrUndefined(hashCode, "Could not execute getHashCode()!");
+        MethodFailedException.assertIsNotNullOrUndefined(hashCode, "Could not execute getHashCode()!");
 
         return hashCode;
     }
@@ -133,7 +133,7 @@ export abstract class AbstractName implements Name {
         let flag: boolean = this.getComponents().length === 0;
 
         // POST 
-        MethodFailureException.assertIsNotNullOrUndefined(flag, "Could not execute isEmpty()!");
+        MethodFailedException.assertIsNotNullOrUndefined(flag, "Could not execute isEmpty()!");
 
         return flag;
     }
@@ -145,7 +145,7 @@ export abstract class AbstractName implements Name {
         let str: string = this.delimiter;
 
         // PRE
-        MethodFailureException.assertIsNotNullOrUndefined(str, "Could not execute getDelimiterCharacter()!");
+        MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute getDelimiterCharacter()!");
 
         return str;
     }
@@ -174,7 +174,7 @@ export abstract class AbstractName implements Name {
 
         // POST
         try {
-            MethodFailureException.assertIsNotNullOrUndefined(this, "Could not execute concat()!");
+            MethodFailedException.assertIsNotNullOrUndefined(this, "Could not execute concat()!");
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
