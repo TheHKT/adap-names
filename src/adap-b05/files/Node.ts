@@ -2,6 +2,8 @@ import { ExceptionType, AssertionDispatcher } from "../common/AssertionDispatche
 
 import { Name } from "../names/Name";
 import { Directory } from "./Directory";
+import { ServiceFailureException } from "../common/ServiceFailureException";
+import { MethodFailedException } from "../common/MethodFailedException";
 
 export class Node {
 
@@ -9,83 +11,86 @@ export class Node {
     protected parentNode: Directory;
 
     constructor(bn: string, pn: Directory) {
-        this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
-
-        this.doSetBaseName(bn);
-        this.parentNode = pn; // why oh why do I have to set this
-        this.initialize(pn);
-
-        this.assertClassInvariants();
-    }
-
-    protected initialize(pn: Directory): void {
-        this.assertIsNotNullOrUndefined(pn, ExceptionType.PRECONDITION);
-        let clone: Node = { ...this };
-
-        this.parentNode = pn;
-        this.parentNode.add(this);
-
-        this.assertClassInvariants();
         try {
-            this.assertSuccessfulMove(pn, ExceptionType.POSTCONDITION);
+            this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
+
+            this.doSetBaseName(bn);
+            this.parentNode = pn; // why oh why do I have to set this
+            this.initialize(pn);
+
+            this.assertClassInvariants();
         } catch (e: any) {
-            this.parentNode.remove(this);
-            this.parentNode = clone.parentNode;
-            throw e;
+            throw new ServiceFailureException("could not construct object", e)
         }
     }
 
+    protected initialize(pn: Directory): void {
+        this.parentNode = pn;
+        this.parentNode.add(this);
+    }
+
     public move(to: Directory): void {
-        this.assertIsNotNullOrUndefined(to, ExceptionType.PRECONDITION);
         let clone: Node = { ...this };
-
-        this.parentNode.remove(this);
-        to.add(this);
-        this.parentNode = to;
-
-        this.assertClassInvariants();
         try {
-        this.assertSuccessfulMove(to, ExceptionType.POSTCONDITION);
+            this.assertIsNotNullOrUndefined(to, ExceptionType.PRECONDITION);
+
+            this.parentNode.remove(this);
+            to.add(this);
+            this.parentNode = to;
+
+            this.assertClassInvariants();
+            this.assertSuccessfulMove(to, ExceptionType.POSTCONDITION);
         } catch (e: any) {
-            to.remove(this);
-            this.parentNode = clone.parentNode;
-            this.parentNode.add(this);
-            throw e;
+            if (e instanceof MethodFailedException) {
+                to.remove(this);
+                this.parentNode = clone.parentNode;
+                this.parentNode.add(this);
+            }
+            throw new ServiceFailureException("could not move", e);
         }
     }
 
     public getFullName(): Name {
-        const result: Name = this.parentNode.getFullName();
-        result.append(this.doGetBaseName());
+        try {
+            const result: Name = this.parentNode.getFullName();
+            result.append(this.doGetBaseName());
 
-        this.assertClassInvariants();
-        this.assertIsNotNullOrUndefined(result, ExceptionType.POSTCONDITION);
-        return result;
+            this.assertClassInvariants();
+            this.assertIsNotNullOrUndefined(result, ExceptionType.POSTCONDITION);
+            return result;
+        } catch (e: any) {
+            throw new ServiceFailureException("could not get fullname", e);
+        }
     }
 
     public getBaseName(): string {
-        const res: string = this.doGetBaseName();
+        try {
+            const res: string = this.doGetBaseName();
 
-        this.assertClassInvariants();
-        this.assertIsNotNullOrUndefined(res, ExceptionType.POSTCONDITION);
-        return res;
+            this.assertClassInvariants();
+            this.assertIsNotNullOrUndefined(res, ExceptionType.POSTCONDITION);
+            return res;
+        } catch (e: any) {
+            throw new ServiceFailureException("could not get base name", e);
+        }
     }
     protected doGetBaseName(): string {
         return this.baseName;
     }
 
     public rename(bn: string): void {
-        this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
-        let oldBn : string = this.getBaseName();
-
-        this.doSetBaseName(bn);
-
-        this.assertClassInvariants();
+        let oldBn: string = this.doGetBaseName();
         try {
+            this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
+
+            this.doSetBaseName(bn);
+
+            this.assertClassInvariants();
             this.assertIsValidBaseName(this.doGetBaseName(), ExceptionType.POSTCONDITION);
         } catch (e: any) {
-            this.doSetBaseName(oldBn);
-            throw e;
+            if (e instanceof MethodFailedException)
+                this.doSetBaseName(oldBn);
+            throw new ServiceFailureException("could not rename", e);
         }
     }
     protected doSetBaseName(bn: string): void {
@@ -93,11 +98,15 @@ export class Node {
     }
 
     public getParentNode(): Directory {
-        const res : Directory = this.doGetParentNode();
+        try {
+            const res: Directory = this.doGetParentNode();
 
-        this.assertClassInvariants();
-        this.assertIsNotNullOrUndefined(res, ExceptionType.POSTCONDITION);
-        return res;
+            this.assertClassInvariants();
+            this.assertIsNotNullOrUndefined(res, ExceptionType.POSTCONDITION);
+            return res;
+        } catch (e: any) {
+            throw new ServiceFailureException("could not get parent node", e);
+        }
     }
     protected doGetParentNode(): Directory {
         return this.parentNode;
@@ -108,16 +117,20 @@ export class Node {
      * @param bn basename of node being searched for
      */
     public findNodes(bn: string): Set<Node> {
-        this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
+        try {
+            this.assertIsValidBaseName(bn, ExceptionType.PRECONDITION);
 
-        const result: Set<Node> = new Set<Node>();
-        if (this.getBaseName() == bn) {
-            result.add(this);
+            const result: Set<Node> = new Set<Node>();
+            if (this.doGetBaseName() == bn) {
+                result.add(this);
+            }
+
+            this.assertClassInvariants();
+            this.assertIsNotNullOrUndefined(result, ExceptionType.POSTCONDITION);
+            return result;
+        } catch (e: any) {
+            throw new ServiceFailureException("could not find nodes", e);
         }
-
-        this.assertClassInvariants();
-        this.assertIsNotNullOrUndefined(result, ExceptionType.POSTCONDITION);
-        return result;
     }
 
     protected assertClassInvariants(): void {
