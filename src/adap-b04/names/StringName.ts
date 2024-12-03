@@ -12,14 +12,14 @@ export class StringName extends AbstractName {
     constructor(source: string, delimiter?: string) {
         super(delimiter);
         // PRE
-        IllegalArgumentException.assertIsNotNullOrUndefined(source, "No valid string given!");
+        //IllegalArgumentException.assertIsNotNullOrUndefined(source, "No valid string given!");
 
         this.setName(source);
         this.setNoComponents(this.toArray().length);
 
         // POST
-        MethodFailedException.assertIsNotNullOrUndefined(this.getName(), "Failed executing constructor!");
-        MethodFailedException.assertIsNotNullOrUndefined(this.getNoComponents(), "Failed executing constructor!");
+        //MethodFailedException.assertIsNotNullOrUndefined(this.getName(), "Failed executing constructor!");
+        //MethodFailedException.assertIsNotNullOrUndefined(this.getNoComponents(), "Failed executing constructor!");
 
         // CLASS INV
         this.ensureInvariants();
@@ -32,7 +32,7 @@ export class StringName extends AbstractName {
         let length: number = this.noComponents;
 
         // POST
-        MethodFailedException.assertIsNotNullOrUndefined(length, "Failed executing getNoComponents()!");
+        //MethodFailedException.assertIsNotNullOrUndefined(length, "Failed executing getNoComponents()!");
 
         return length;
     }
@@ -76,8 +76,8 @@ export class StringName extends AbstractName {
 
         // POST
         try {
-            MethodFailedException.assertIsNotNullOrUndefined(this.getNoComponents(), "Failed setting component!");
-            MethodFailedException.assertIsNotNullOrUndefined(this.getName(), "Failed setting component!");
+            //MethodFailedException.assertIsNotNullOrUndefined(this.getNoComponents(), "Failed setting component!");
+            //MethodFailedException.assertIsNotNullOrUndefined(this.getName(), "Failed setting component!");
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;

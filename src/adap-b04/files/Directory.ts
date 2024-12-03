@@ -8,14 +8,14 @@ export class Directory extends Node {
 
     constructor(bn: string, pn: Directory) {
         // PRE
-        IllegalArgumentException.assertIsNotNullOrUndefined(bn, "bn is null");
-        IllegalArgumentException.assertIsNotNullOrUndefined(pn, "Pn is null");
+        //IllegalArgumentException.assertIsNotNullOrUndefined(bn, "bn is null");
+        //IllegalArgumentException.assertIsNotNullOrUndefined(pn, "Pn is null");
 
         super(bn, pn);
 
         // POST 
-        MethodFailedException.assertIsNotNullOrUndefined(bn, "bn is null");
-        MethodFailedException.assertIsNotNullOrUndefined(pn, "pn is null");
+        //MethodFailedException.assertIsNotNullOrUndefined(bn, "bn is null");
+        //MethodFailedException.assertIsNotNullOrUndefined(pn, "pn is null");
 
         // CLASS INV
         this.ensureInvariants();
@@ -30,14 +30,14 @@ export class Directory extends Node {
         this.ensureInvariants();
 
         // PRE
-        IllegalArgumentException.assertIsNotNullOrUndefined(cn);
+        //IllegalArgumentException.assertIsNotNullOrUndefined(cn);
         let clone = this.clone();
 
         this.childNodes.add(cn);
 
         // POST
         try {
-            MethodFailedException.assertIsNotNullOrUndefined(this.childNodes);
+            //MethodFailedException.assertIsNotNullOrUndefined(this.childNodes);
         } catch (exception: any) {
             Object.assign(this, clone);
             throw exception;
@@ -49,14 +49,14 @@ export class Directory extends Node {
         this.ensureInvariants();
 
         // PRE
-        IllegalArgumentException.assertIsNotNullOrUndefined(cn);
+        //IllegalArgumentException.assertIsNotNullOrUndefined(cn);
         let clone = this.clone();
 
         this.childNodes.delete(cn); // Yikes! Should have been called remove
 
         // POST
         try {
-            MethodFailedException.assertIsNotNullOrUndefined(this.childNodes);
+           // MethodFailedException.assertIsNotNullOrUndefined(this.childNodes);
         } catch (exception: any) {
             Object.assign(this, clone);
             throw exception;

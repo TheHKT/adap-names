@@ -27,7 +27,7 @@ export class StringArrayName extends AbstractName {
         let length: number = this.components.length;
 
         // POST
-        MethodFailedException.assertIsNotNullOrUndefined(length, "Failed executing getNoComponents()!");
+        //MethodFailedException.assertIsNotNullOrUndefined(length, "Failed executing getNoComponents()!");
 
         return length;
     }

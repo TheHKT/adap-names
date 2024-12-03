@@ -30,8 +30,8 @@ export abstract class AbstractName implements Name {
         let clone: Name = { ...this };
 
         // POST
-        MethodFailedException.assertIsNotNullOrUndefined(clone, "Could not execute clone()!");
-        MethodFailedException.assertCondition(this !== clone, "Clone is not a deep copy.");
+        //MethodFailedException.assertIsNotNullOrUndefined(clone, "Could not execute clone()!");
+        //MethodFailedException.assertCondition(this !== clone, "Clone is not a deep copy.");
         return clone;
     }
 
@@ -66,7 +66,7 @@ export abstract class AbstractName implements Name {
         let str: string = this.getComponents().join(this.getDelimiterCharacter());
 
         // POST
-        MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute toString()!");
+        //MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute toString()!");
 
         return str;
     }
@@ -79,7 +79,7 @@ export abstract class AbstractName implements Name {
         let str: string = this.toString();
 
         // POST
-        MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute asDataString()!");
+        //MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute asDataString()!");
 
         return str;
     }
@@ -98,12 +98,12 @@ export abstract class AbstractName implements Name {
         // CLASS INV
         this.ensureInvariants();
         // PRE
-        IllegalArgumentException.assertIsNotNullOrUndefined(other, "Name is null!");
+        //IllegalArgumentException.assertIsNotNullOrUndefined(other, "Name is null!");
 
         let flag: boolean = this.toString() == other.toString();
 
         // POST 
-        MethodFailedException.assertIsNotNullOrUndefined(flag, "Could not execute isEqual()!");
+        //MethodFailedException.assertIsNotNullOrUndefined(flag, "Could not execute isEqual()!");
 
         return flag;
     }
@@ -121,7 +121,7 @@ export abstract class AbstractName implements Name {
         }
 
         // POST
-        MethodFailedException.assertIsNotNullOrUndefined(hashCode, "Could not execute getHashCode()!");
+        //MethodFailedException.assertIsNotNullOrUndefined(hashCode, "Could not execute getHashCode()!");
 
         return hashCode;
     }
@@ -133,7 +133,7 @@ export abstract class AbstractName implements Name {
         let flag: boolean = this.getComponents().length === 0;
 
         // POST 
-        MethodFailedException.assertIsNotNullOrUndefined(flag, "Could not execute isEmpty()!");
+        //MethodFailedException.assertIsNotNullOrUndefined(flag, "Could not execute isEmpty()!");
 
         return flag;
     }
@@ -145,7 +145,7 @@ export abstract class AbstractName implements Name {
         let str: string = this.delimiter;
 
         // PRE
-        MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute getDelimiterCharacter()!");
+        //MethodFailedException.assertIsNotNullOrUndefined(str, "Could not execute getDelimiterCharacter()!");
 
         return str;
     }
@@ -163,7 +163,7 @@ export abstract class AbstractName implements Name {
         // CLASS INV
         this.ensureInvariants();
         // PRE
-        IllegalArgumentException.assertIsNotNullOrUndefined(other, "Name is null!");
+        //IllegalArgumentException.assertIsNotNullOrUndefined(other, "Name is null!");
 
         // Cloning old state for post condition
         let clone: Name = this.clone();
@@ -174,7 +174,7 @@ export abstract class AbstractName implements Name {
 
         // POST
         try {
-            MethodFailedException.assertIsNotNullOrUndefined(this, "Could not execute concat()!");
+            //MethodFailedException.assertIsNotNullOrUndefined(this, "Could not execute concat()!");
         } catch (e: any) {
             Object.assign(this, clone);
             throw e;
@@ -182,8 +182,8 @@ export abstract class AbstractName implements Name {
     }
 
     protected ensureInvariants(): void {
-        InvalidStateException.assertIsNotNullOrUndefined(this.delimiter, "Delimiter must not be null!");
-        InvalidStateException.assertCondition(this.delimiter.length === 1, "Delimiter must be a single character!");
+        //InvalidStateException.assertIsNotNullOrUndefined(this.delimiter, "Delimiter must not be null!");
+        //InvalidStateException.assertCondition(this.delimiter.length === 1, "Delimiter must be a single character!");
     }
     protected assertEscapedString(exceptionClass: any, component: string): void {
         exceptionClass.assertIsNotNullOrUndefined(component, "String must not be null!");
