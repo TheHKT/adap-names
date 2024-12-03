@@ -9,12 +9,12 @@ export class StringName extends AbstractName {
     protected name: string = "";
     protected noComponents: number = 0;
 
-    constructor(other: string, delimiter?: string) {
+    constructor(source: string, delimiter?: string) {
         super(delimiter);
         // PRE
-        IllegalArgumentException.assertIsNotNullOrUndefined(other, "No valid string given!");
+        IllegalArgumentException.assertIsNotNullOrUndefined(source, "No valid string given!");
 
-        this.setName(other);
+        this.setName(source);
         this.setNoComponents(this.toArray().length);
 
         // POST

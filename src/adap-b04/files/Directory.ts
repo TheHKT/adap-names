@@ -21,7 +21,11 @@ export class Directory extends Node {
         this.ensureInvariants();
     }
 
-    public add(cn: Node): void {
+    public hasChildNode(cn: Node): boolean {
+        return this.childNodes.has(cn);
+    }
+
+    public addChildNode(cn: Node): void {
         // CLASS INV
         this.ensureInvariants();
 
@@ -40,7 +44,7 @@ export class Directory extends Node {
         }
     }
 
-    public remove(cn: Node): void {
+    public removeChildNode(cn: Node): void {
         // CLASS INV
         this.ensureInvariants();
 

@@ -1,4 +1,3 @@
-import { ExceptionType, AssertionDispatcher } from "../common/AssertionDispatcher";
 
 import { Name } from "../names/Name";
 import { Directory } from "./Directory";
@@ -26,7 +25,7 @@ export class Node {
 
     protected initialize(pn: Directory): void {
         this.parentNode = pn;
-        this.parentNode.add(this);
+        this.parentNode.addChildNode(this);
     }
 
     public move(to: Directory): void {
@@ -34,8 +33,8 @@ export class Node {
         try {
             this.assertIsNotNullOrUndefined(to, ExceptionType.PRECONDITION);
 
-            this.parentNode.remove(this);
-            to.add(this);
+            this.parentNode.removeChildNode(this);
+            to.addChildNode(this);
             this.parentNode = to;
 
             this.assertClassInvariants();

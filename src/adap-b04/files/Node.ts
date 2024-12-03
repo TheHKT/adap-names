@@ -21,7 +21,7 @@ export class Node {
 
     protected initialize(pn: Directory): void {
         this.parentNode = pn;
-        this.parentNode.add(this);
+        this.parentNode.addChildNode(this);
 
         // POST
         MethodFailedException.assertIsNotNullOrUndefined(this.baseName, "Base name is null or undefined.");
@@ -39,8 +39,8 @@ export class Node {
         IllegalArgumentException.assertIsNotNullOrUndefined(to, "Destination is null or undefined.");
         let clone = this.clone();
 
-        this.parentNode.remove(this);
-        to.add(this);
+        this.parentNode.removeChildNode(this);
+        to.addChildNode(this);
         this.parentNode = to;
 
         // POST

@@ -7,12 +7,12 @@ export class StringArrayName extends AbstractName {
 
     protected components: string[] = [];
 
-    constructor(other: string[], delimiter?: string) {
+    constructor(source: string[], delimiter?: string) {
         super(delimiter);
         // PRE
-        this.assertValidComponents(IllegalArgumentException, other);
+        this.assertValidComponents(IllegalArgumentException, source);
 
-        this.components = other;
+        this.components = source;
 
         // POST
         this.assertValidComponents(MethodFailedException, this.components);

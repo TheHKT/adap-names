@@ -10,7 +10,11 @@ export class Directory extends Node {
         super(bn, pn);
     }
 
-    public add(cn: Node): void {
+    public hasChildNode(cn: Node): boolean {
+        return this.childNodes.has(cn);
+    }
+
+    public addChildNode(cn: Node): void {
         let clone: Set<Node> = new Set<Node>(this.childNodes);
         try {
             this.assertValidNode(cn, ExceptionType.PRECONDITION);
@@ -28,7 +32,7 @@ export class Directory extends Node {
         }
     }
 
-    public remove(cn: Node): void {
+    public removeChildNode(cn: Node): void {
         let clone: Set<Node> = new Set<Node>(this.childNodes);
         try {
             this.assertValidNode(cn, ExceptionType.PRECONDITION);

@@ -6,11 +6,11 @@ export class StringArrayName implements Name {
     protected delimiter: string = DEFAULT_DELIMITER;
     protected components: string[] = [];
 
-    constructor(other: string[], delimiter?: string) {
+    constructor(source: string[], delimiter?: string) {
         if (delimiter) {
             this.delimiter = delimiter;
         }
-        this.components = other;
+        this.components = source;
     }
 
     public asString(delimiter: string = this.delimiter): string {
