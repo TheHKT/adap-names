@@ -44,13 +44,35 @@ export class StringName extends AbstractName {
     protected doGetNoComponents(): number {
         return this.noComponents
     }	
-    private dosetNoComponents(noComponents: number) {
-        this.noComponents = noComponents;
-    }
+
     private toArray(): string[] {
-        const regexEscapedDelimiter = this.getDelimiterCharacter().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const rx = new RegExp(`(?<!\\${ESCAPE_CHARACTER})${regexEscapedDelimiter}`, "g");
-        return this.doGetName().split(rx);
+        const name: string = this.doGetName();
+        const delimiter: string = this.doGetDelimiterCharacter();
+        if (name === '') {
+            return [''];
+        }
+
+        const array: string[] = [''];
+        let isPreviousCharEscape = false;
+
+        for (let i = 0; i < name.length; i++) {
+            const currentChar = name.charAt(i);
+
+            if (isPreviousCharEscape) {
+                array[array.length - 1] += currentChar;
+                isPreviousCharEscape = false;
+            } else {
+                if (currentChar === ESCAPE_CHARACTER) {
+                    array[array.length - 1] += currentChar;
+                    isPreviousCharEscape = true;
+                } else if (currentChar === delimiter) {
+                    array.push('');
+                } else {
+                    array[array.length - 1] += currentChar;
+                }
+            }
+        }
+        return array;
     }
 
     public getComponent(i: number): string {
@@ -182,8 +204,5 @@ export class StringName extends AbstractName {
     }
     private doGetName(): string {
         return this.name;
-    }
-    private dosetName(name: string) {
-        this.name = name;
     }
 }

@@ -31,7 +31,8 @@ export abstract class AbstractName implements Name, Cloneable {
 
     public clone(): Name {
         try {
-            let clone: Name = { ...this };
+            const temp = Object.create(Object.getPrototypeOf(this));
+            const clone = Object.assign(temp, this);
 
             // CLASS INV
             this.ensureInvariants();
@@ -50,7 +51,7 @@ export abstract class AbstractName implements Name, Cloneable {
             // PRE
             this.assertValidDelimiter(ExceptionType.PRECONDITION, delimiter);
 
-            let str: string[] = this.getComponents().slice();
+            let str: string[] = this.doGetComponents().slice();
             let length: number = this.getNoComponents();
             for (let i: number = 0; i < length; i++) {
                 str[i] = this.removeEscapeCharacters(str[i], delimiter);
@@ -61,7 +62,7 @@ export abstract class AbstractName implements Name, Cloneable {
             this.ensureInvariants();
 
             // POST
-            this.assertUnescapedString(ExceptionType.POSTCONDITION, result);
+            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, result, "Could not execute asString()!");
             return result;
         } catch (e: any) {
             throw new ServiceFailureException("Could not convert to string", e);
@@ -136,7 +137,7 @@ export abstract class AbstractName implements Name, Cloneable {
         }
     }
 
-    private getComponents(): string[] {
+    private doGetComponents(): string[] {
         let str: string[] = [];
         let length: number = this.getNoComponents();
 
@@ -186,7 +187,7 @@ export abstract class AbstractName implements Name, Cloneable {
 
     public isEmpty(): boolean {
         try {
-            let flag: boolean = this.getComponents().length === 0;
+            let flag: boolean = this.doGetComponents().length === 0;
 
             // CLASS INV
             this.ensureInvariants();
@@ -253,21 +254,29 @@ export abstract class AbstractName implements Name, Cloneable {
     }
     protected assertEscapedString(exceptionClass: ExceptionType, component: string): void {
         this.assertIsNotNullOrUndefined(exceptionClass, component, "String must not be null!");
-        const regex = new RegExp(`(?<!${ESCAPE_CHARACTER.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')})${this.delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')}`, 'g');
-        AssertionDispatcher.dispatch(exceptionClass, !regex.test(component), "String is not valid unescaped!");
-    }
-    protected assertUnescapedString(exceptionClass: ExceptionType, component: string): void {
-        this.assertIsNotNullOrUndefined(exceptionClass, component, "String must not be null!");
-        const regex = new RegExp(`(?<=${ESCAPE_CHARACTER.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')})${this.delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\[[[[CODEBLOCK_0]]]]amp;')}`, 'g');
-        AssertionDispatcher.dispatch(exceptionClass, !regex.test(component), "String is escaped!");
+        let readEscapeChar: boolean = false;
+        for (let i = 0; i < component.length; i++) {
+            if (component.charAt(i) === ESCAPE_CHARACTER) {
+                readEscapeChar = !readEscapeChar;
+            } else if (component.charAt(i) === this.getDelimiterCharacter()) {
+                if (!readEscapeChar) {
+                    AssertionDispatcher.dispatch(exceptionClass, false, "String is not valid escaped!");
+                    break;
+                }
+                readEscapeChar = false;
+            } else {
+                readEscapeChar = false;
+            }
+        }
     }
     protected assertValidDelimiter(exceptionClass: ExceptionType, delimiter: string = this.delimiter): void {
         this.assertIsNotNullOrUndefined(exceptionClass, delimiter, "Delimiter must not be null!");
         AssertionDispatcher.dispatch(exceptionClass, delimiter.length === 1, "Delimiter must be a single character!");
+        AssertionDispatcher.dispatch(exceptionClass, delimiter !== ESCAPE_CHARACTER, "Delimiter must not be escape character!");
     }
     protected assertValidIndex(exceptionClass: ExceptionType, i: number) {
         this.assertIsNotNullOrUndefined(exceptionClass, i, "Index must not be null!");
-        AssertionDispatcher.dispatch(exceptionClass, i < this.getNoComponents(), "Index must be within the array!");
+        AssertionDispatcher.dispatch(exceptionClass, i < this.getNoComponents() && i>=0, "Index must be within the array!");
     }
     protected assertValidRemoval(exceptionClass: ExceptionType, oldNoComponents: number) {
         this.assertIsNotNullOrUndefined(exceptionClass, this.getNoComponents(), "Failed removing component!");

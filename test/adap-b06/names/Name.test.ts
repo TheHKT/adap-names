@@ -134,7 +134,7 @@ describe("Tests B02", () => {
 describe("Clone", () => {
   it("clone StringArrayName", () => {
     let n: StringArrayName = new StringArrayName(["oss", "cs", "fau", "de"]);
-    let n2 = n.insert(4, "test");
+    let n2 = n.append( "test");
     let clone = n2.clone();
     let n3 = clone.append("test2");
     expect(clone.asString()).toBe("oss.cs.fau.de.test");
@@ -146,7 +146,7 @@ describe("Clone", () => {
   });
   it("clone StringName", () => {
     let n: StringName = new StringName("oss.cs.fau.de");
-    let n2 = n.insert(4, "test");
+    let n2 = n.append("test");
     let clone = n2.clone();
     let n3 = clone.append("test2");
     expect(clone.asString()).toBe("oss.cs.fau.de.test");
