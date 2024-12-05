@@ -1,7 +1,5 @@
 import { ESCAPE_CHARACTER } from "../common/Printable";
 import { AbstractName } from "./AbstractName";
-import { Name } from "./Name";
-import { MethodFailedException } from "../common/MethodFailedException";
 import { ExceptionType } from "../common/AssertionDispatcher";
 import { ServiceFailureException } from "../common/ServiceFailureException";
 
@@ -16,13 +14,13 @@ export class StringName extends AbstractName {
             // PRE
             this.assertIsNotNullOrUndefined(ExceptionType.PRECONDITION, other, "No valid string given!");
 
-            this.setName(other);
-            this.setNoComponents(this.toArray().length);
+            this.name = other;
+            this.noComponents = this.toArray().length;
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, this.getName(), "Failed executing constructor!");
+            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, this.doGetName(), "Failed executing constructor!");
             this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, this.getNoComponents(), "Failed executing constructor!");
         } catch (e: any) {
             throw new ServiceFailureException("Failed executing constructor!", e);
@@ -46,13 +44,13 @@ export class StringName extends AbstractName {
     protected doGetNoComponents(): number {
         return this.noComponents
     }	
-    private setNoComponents(noComponents: number) {
+    private dosetNoComponents(noComponents: number) {
         this.noComponents = noComponents;
     }
     private toArray(): string[] {
         const regexEscapedDelimiter = this.getDelimiterCharacter().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const rx = new RegExp(`(?<!\\${ESCAPE_CHARACTER})${regexEscapedDelimiter}`, "g");
-        return this.getName().split(rx);
+        return this.doGetName().split(rx);
     }
 
     public getComponent(i: number): string {
@@ -72,119 +70,120 @@ export class StringName extends AbstractName {
         }
     }
 
-    public setComponent(i: number, c: string) {
+    public setComponent(i: number, c: string): StringName {
         // Collecting old values for post condition
-        let clone: Name = this.clone();
+        let clone: StringName = this.createDeepCopy();
         try {
             // PRE
-            this.assertValidIndex(ExceptionType.PRECONDITION, i);
-            this.assertEscapedString(ExceptionType.PRECONDITION, c);
+            clone.assertValidIndex(ExceptionType.PRECONDITION, i);
+            clone.assertEscapedString(ExceptionType.PRECONDITION, c);
 
-            let arr: string[] = this.toArray();
+            let arr: string[] = clone.toArray();
             arr[i] = c;
-            let str: string = arr.join(this.getDelimiterCharacter());
-            this.setNoComponents(arr.length);
-            this.setName(str);
+            let str: string = arr.join(clone.getDelimiterCharacter());
+
+            clone.noComponents = arr.length;
+            clone.name = str;
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, this.doGetNoComponents(), "Failed setting component!");
-            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, this.getName(), "Failed setting component!");
+            clone.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, clone.doGetNoComponents(), "Failed setting component!");
+            clone.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, clone.doGetName(), "Failed setting component!");
+
+            return clone;
         } catch (e: any) {
-            if (e instanceof MethodFailedException) {
-                Object.assign(this, clone);
-            }
             throw new ServiceFailureException("Failed setting component!", e);
         }
     }
 
-    public insert(i: number, c: string) {
+    public insert(i: number, c: string): StringName {
         // Cloning old state for post condition
-        let clone: Name = this.clone();
+        let clone: StringName = this.createDeepCopy();
         try {
             // PRE
-            this.assertValidIndex(ExceptionType.PRECONDITION, i);
-            this.assertEscapedString(ExceptionType.PRECONDITION, c);
-            let oldNoComponents: number = this.doGetNoComponents();
+            clone.assertValidIndex(ExceptionType.PRECONDITION, i);
+            clone.assertEscapedString(ExceptionType.PRECONDITION, c);
+            let oldNoComponents: number = clone.doGetNoComponents();
 
-            let arr: string[] = this.toArray();
+            let arr: string[] = clone.toArray();
             arr.splice(i, 0, c);
-            let str: string = arr.join(this.getDelimiterCharacter());
-            this.setNoComponents(arr.length);
-            this.setName(str);
+            let str: string = arr.join(clone.getDelimiterCharacter());
+
+            clone.noComponents = arr.length;
+            clone.name = str;
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertValidComponentAddition(ExceptionType.POSTCONDITION, i, oldNoComponents);
+            clone.assertValidComponentAddition(ExceptionType.POSTCONDITION, i, oldNoComponents);
+            return clone;
         } catch (e: any) {
-            if (e instanceof MethodFailedException) {
-                Object.assign(this, clone);
-            }
             throw new ServiceFailureException("Failed inserting component!", e);
         }
     }
 
-    public append(c: string) {
+    public append(c: string): StringName {
         // Cloning old state for post condition
-        let clone: Name = this.clone();
+        let clone: StringName = this.createDeepCopy();
         try {
             // PRE
-            this.assertEscapedString(ExceptionType.PRECONDITION, c);
+            clone.assertEscapedString(ExceptionType.PRECONDITION, c);
 
-            let oldNoComponents: number = this.doGetNoComponents();
+            let oldNoComponents: number = clone.doGetNoComponents();
 
-            this.setName(this.getName() + this.getDelimiterCharacter() + c);
-            this.setNoComponents(this.doGetNoComponents() + 1);
+            clone.name = clone.doGetName() + clone.getDelimiterCharacter() + c;
+            clone.noComponents = clone.doGetNoComponents() + 1;
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertValidComponentAddition(ExceptionType.POSTCONDITION, this.doGetNoComponents() - 1, oldNoComponents);
+            clone.assertValidComponentAddition(ExceptionType.POSTCONDITION, clone.doGetNoComponents() - 1, oldNoComponents);
+
+            return clone;
         } catch (e: any) {
-            if (e instanceof MethodFailedException) {
-                Object.assign(this, clone);
-            }
             throw new ServiceFailureException("Failed appending component!", e);
         }
     }
 
-    public remove(i: number) {
+    public remove(i: number): StringName {
         // Cloning old state for post condition
-        let clone: Name = this.clone();
+        let clone: StringName = this.createDeepCopy();
         try {
             // PRE
-            this.assertValidIndex(ExceptionType.PRECONDITION, i);
-            let oldNoComponents: number = this.doGetNoComponents();
+            clone.assertValidIndex(ExceptionType.PRECONDITION, i);
+            let oldNoComponents: number = clone.doGetNoComponents();
 
-            let arr: string[] = this.toArray();
+            let arr: string[] = clone.toArray();
             arr.splice(i, 1);
-            let str: string = arr.join(this.getDelimiterCharacter());
-            this.setNoComponents(arr.length);
-            this.setName(str);
+            let str: string = arr.join(clone.getDelimiterCharacter());
+
+            clone.noComponents = arr.length;
+            clone.name = str;
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertValidRemoval(ExceptionType.POSTCONDITION, oldNoComponents);
-        } catch (e: any) {
-            if (e instanceof MethodFailedException) {
+            clone.assertValidRemoval(ExceptionType.POSTCONDITION, oldNoComponents);
 
-                Object.assign(this, clone);
-            }
+            return clone;
+        } catch (e: any) {
             throw new ServiceFailureException("Failed removing component!", e);
         }
+    }
+
+    protected createDeepCopy(): StringName {
+        return new StringName(this.doGetName(), this.getDelimiterCharacter());
     }
 
     protected ensureInvariants(): void {
         super.ensureInvariants();
         //this.assertValidName();
     }
-    private getName(): string {
+    private doGetName(): string {
         return this.name;
     }
-    private setName(name: string) {
+    private dosetName(name: string) {
         this.name = name;
     }
 }

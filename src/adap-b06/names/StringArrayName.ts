@@ -1,8 +1,6 @@
-import { Name } from "./Name";
 import { AbstractName } from "./AbstractName";
 import { ExceptionType } from "../common/AssertionDispatcher";
 import { ServiceFailureException } from "../common/ServiceFailureException";
-import { MethodFailedException } from "../common/MethodFailedException";
 
 export class StringArrayName extends AbstractName {
 
@@ -43,12 +41,19 @@ export class StringArrayName extends AbstractName {
         return this.components.length
     }
 
+    protected doGetComponents(): string[] {
+        return this.components;
+    }
+
+    protected doGetComponent(i: number): string {
+        return this.components[i];
+    }
     public getComponent(i: number): string {
         try {
             // PRE
             this.assertValidIndex(ExceptionType.PRECONDITION, i);
 
-            let str = this.components[i];
+            let str = this.doGetComponent(i);
 
             // CLASS INV
             this.ensureInvariants();
@@ -61,93 +66,90 @@ export class StringArrayName extends AbstractName {
         }
     }
 
-    public setComponent(i: number, c: string) {
-        // Cloning old state for post condition
-        let clone: Name = this.clone();
+    public setComponent(i: number, c: string): StringArrayName {
+        let clone: StringArrayName = this.createDeepCopy();
         try {
             // PRE
-            this.assertValidIndex(ExceptionType.PRECONDITION, i);
-            this.assertEscapedString(ExceptionType.PRECONDITION, c);
+            clone.assertValidIndex(ExceptionType.PRECONDITION, i);
+            clone.assertEscapedString(ExceptionType.PRECONDITION, c);
 
-            this.components[i] = c;
+            clone.components[i] = c;
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertEscapedString(ExceptionType.POSTCONDITION, this.components[i]);
+            clone.assertEscapedString(ExceptionType.POSTCONDITION, clone.doGetComponent(i));
+            return clone;
         } catch (e: any) {
-            if (e instanceof MethodFailedException) {
-                Object.assign(this, clone);
-            }
             throw new ServiceFailureException("Failed getting component!", e);
         }
     }
 
-    public insert(i: number, c: string) {
+    public insert(i: number, c: string): StringArrayName {
         // Cloning old state for post condition
-        let clone: Name = this.clone();
+        let clone: StringArrayName = this.createDeepCopy();
         try {
             // PRE
-            this.assertValidIndex(ExceptionType.PRECONDITION, i);
-            this.assertEscapedString(ExceptionType.PRECONDITION, c);
-            let oldNoComponents = this.doGetNoComponents();
+            clone.assertValidIndex(ExceptionType.PRECONDITION, i);
+            clone.assertEscapedString(ExceptionType.PRECONDITION, c);
+            let oldNoComponents = clone.doGetNoComponents();
 
-            this.components.splice(i, 0, c);
+            clone.doGetComponents().splice(i, 0, c);
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertValidComponentAddition(ExceptionType.POSTCONDITION, i, oldNoComponents);
+            clone.assertValidComponentAddition(ExceptionType.POSTCONDITION, i, oldNoComponents);
+            return clone;
         } catch (e: any) {
-            if (e instanceof MethodFailedException) {
-                Object.assign(this, clone);
-            }
             throw new ServiceFailureException("Failed inserting component!", e);
         }
     }
 
-    public append(c: string) {
+    public append(c: string): StringArrayName {
         // Cloning old state for post condition
-        let clone: Name = this.clone();
+        let clone: StringArrayName = this.createDeepCopy();
         try {
             // PRE
-            this.assertEscapedString(ExceptionType.PRECONDITION, c);
-            let oldNoComponents = this.doGetNoComponents();
+            clone.assertEscapedString(ExceptionType.PRECONDITION, c);
+            let oldNoComponents = clone.doGetNoComponents();
 
-            this.components.push(c);
+            clone.doGetComponents().push(c);
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertValidComponentAddition(ExceptionType.POSTCONDITION, this.doGetNoComponents() - 1, oldNoComponents);
+            clone.assertValidComponentAddition(ExceptionType.POSTCONDITION, clone.doGetNoComponents() - 1, oldNoComponents);
+
+            return clone;
         } catch (e: any) {
-            if (e instanceof MethodFailedException) {
-                Object.assign(this, clone);
-            }
             throw new ServiceFailureException("Failed appending component!", e);
         }
     }
 
-    public remove(i: number) {
+    public remove(i: number): StringArrayName {
         // Cloning old state for post condition
-        let clone: Name = this.clone();
+        let clone: StringArrayName = this.createDeepCopy();
         try {
-        // PRE
-        this.assertValidIndex(ExceptionType.PRECONDITION, i);
-        let oldNoComponents = this.doGetNoComponents();
+            // PRE
+        clone.assertValidIndex(ExceptionType.PRECONDITION, i);
+        let oldNoComponents = clone.doGetNoComponents();
 
-        this.components.splice(i, 1);
+        clone.doGetComponents().splice(i, 1);
 
         // CLASS INV
         this.ensureInvariants();
         // POST
-        this.assertValidRemoval(ExceptionType.POSTCONDITION, oldNoComponents);
+        clone.assertValidRemoval(ExceptionType.POSTCONDITION, oldNoComponents);
+
+        return clone;
         } catch (e: any) {
-            if (e instanceof MethodFailedException) {
-                Object.assign(this, clone);
-            }
             throw e;
         }
+    }
+
+    protected createDeepCopy(): StringArrayName {
+        return new StringArrayName(this.doGetComponents().slice(), this.getDelimiterCharacter());
     }
 
     protected ensureInvariants(): void {

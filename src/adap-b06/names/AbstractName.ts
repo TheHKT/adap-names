@@ -4,7 +4,6 @@ import { Name } from "./Name";
 import { AssertionDispatcher, ExceptionType } from "../common/AssertionDispatcher";
 import { Cloneable } from "../common/Cloneable";
 import { ServiceFailureException } from "../common/ServiceFailureException";
-import { MethodFailedException } from "../common/MethodFailedException";
 
 export abstract class AbstractName implements Name, Cloneable {
 
@@ -51,7 +50,7 @@ export abstract class AbstractName implements Name, Cloneable {
             // PRE
             this.assertValidDelimiter(ExceptionType.PRECONDITION, delimiter);
 
-            let str: string[] = this.getComponents();
+            let str: string[] = this.getComponents().slice();
             let length: number = this.getNoComponents();
             for (let i: number = 0; i < length; i++) {
                 str[i] = this.removeEscapeCharacters(str[i], delimiter);
@@ -69,19 +68,37 @@ export abstract class AbstractName implements Name, Cloneable {
         }
     }
 
-    private removeEscapeCharacters(s: string, delimiter: string): string {
-        let buff: string = "Ǽ"; // \. or \\.
-        let masked: string = s.replaceAll(delimiter + delimiter, buff);
-        return masked.replaceAll(delimiter, "").replaceAll(buff, delimiter);
+    private removeEscapeCharacters(inputString: string, delimiter: string): string {
+            let previousCharIsEscape: boolean = false;
+            let unmaskedString: string = '';
+            for (let index = 0; index < inputString.length; index++) {
+                let currentChar = inputString.charAt(index);
+                if (previousCharIsEscape) {
+                    if (currentChar === ESCAPE_CHARACTER) {
+                        unmaskedString += ESCAPE_CHARACTER;
+                    } else if (currentChar === delimiter) {
+                        unmaskedString += delimiter;
+                    } else {
+                        unmaskedString += currentChar;
+                    }
+                    previousCharIsEscape = false;
+                } else {
+                    if (currentChar === ESCAPE_CHARACTER) {
+                        previousCharIsEscape = true;
+                    } else {
+                        unmaskedString += currentChar;
+                    }
+                }
+            }
+            return unmaskedString;
     }
 
     public toString(): string {
         try {
-            let str: string = this.getComponents().join(this.doGetDelimiterCharacter());
+            let str: string = this.asDataString();
 
             // CLASS INV
             this.ensureInvariants();
-
             // POST
             this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, str, "Could not execute toString()!");
 
@@ -94,15 +111,26 @@ export abstract class AbstractName implements Name, Cloneable {
     // We assume that delimiter inside a component is escaped with ESCAPE_CHARACTER
     public asDataString(): string {
         try {
-            let str: string = this.toString();
+            let nameField: string = '';
+            const delimiter: string = this.doGetDelimiterCharacter();
+            const noComponents: number = this.getNoComponents();
+
+            for (let i = 0; i < noComponents; i++) {
+                let component: string = this.getComponent(i);
+                nameField += component;
+                if (i < noComponents - 1) {
+                    nameField += delimiter;
+                }
+            }
+
+            const json = JSON.stringify({ delimiter: delimiter, name: nameField });
 
             // CLASS INV
             this.ensureInvariants();
-
             // POST
-            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, str, "Could not execute asDataString()!");
+            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, json, "Could not execute asDataString()!");
 
-            return str;
+            return json;
         } catch (e: any) {
             throw new ServiceFailureException("Could not convert to data string", e);
         }
@@ -192,13 +220,13 @@ export abstract class AbstractName implements Name, Cloneable {
     abstract getNoComponents(): number;
 
     abstract getComponent(i: number): string;
-    abstract setComponent(i: number, c: string): void;
+    abstract setComponent(i: number, c: string): Name;
 
-    abstract insert(i: number, c: string): void;
-    abstract append(c: string): void;
-    abstract remove(i: number): void;
+    abstract insert(i: number, c: string): Name;
+    abstract append(c: string): Name;
+    abstract remove(i: number): Name;
 
-    public concat(other: Name): void {
+    public concat(other: Name): Name {
         // Cloning old state for post condition
         let clone: Name = this.clone();
         try {
@@ -206,17 +234,15 @@ export abstract class AbstractName implements Name, Cloneable {
             this.assertIsNotNullOrUndefined(ExceptionType.PRECONDITION, other, "Name is null!");
 
             for (let i = 0; i < other.getNoComponents(); i++) {
-                this.append(other.getComponent(i));
+                clone = clone.append(other.getComponent(i));
             }
 
             // CLASS INV
             this.ensureInvariants();
             // POST
-            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, this, "Could not execute concat()!");
+            this.assertIsNotNullOrUndefined(ExceptionType.POSTCONDITION, clone, "Could not execute concat()!");
+            return clone;
         } catch (e: any) {
-            if (e instanceof MethodFailedException) {
-                Object.assign(this, clone);
-            }
             throw new ServiceFailureException("Could not concat", e);
         }
     }
