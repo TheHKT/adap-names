@@ -16,17 +16,17 @@ export class AssertionDispatcher {
         this.DISPATCHER.doDispatch(key, condition, message);
     }
 
-    protected methods: { [key in ExceptionType]: (c: boolean, m?: string) => void };
+    protected methods: { [key in ExceptionType]: (c: boolean, m: string) => void };
 
     constructor() {
         this.methods = {
-            [ExceptionType.PRECONDITION]: IllegalArgumentException.assert, 
-            [ExceptionType.CLASS_INVARIANT]: InvalidStateException.assert,
-            [ExceptionType.POSTCONDITION]: MethodFailedException.assert
+            [ExceptionType.PRECONDITION]: IllegalArgumentException.assertCondition,
+            [ExceptionType.CLASS_INVARIANT]: InvalidStateException.assertCondition,
+            [ExceptionType.POSTCONDITION]: MethodFailedException.assertCondition
         }
     }
 
     protected doDispatch(key: ExceptionType, condition: boolean, message?: string) {
-        this.methods[key](condition, message);
+        this.methods[key](condition, message || "Default error message");
     }
 }

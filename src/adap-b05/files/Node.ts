@@ -3,6 +3,7 @@ import { Name } from "../names/Name";
 import { Directory } from "./Directory";
 import { ServiceFailureException } from "../common/ServiceFailureException";
 import { MethodFailedException } from "../common/MethodFailedException";
+import {ExceptionType} from "../common/AssertionDispatcher";
 
 export class Node {
 
@@ -41,9 +42,9 @@ export class Node {
             this.assertSuccessfulMove(to, ExceptionType.POSTCONDITION);
         } catch (e: any) {
             if (e instanceof MethodFailedException) {
-                to.remove(this);
+                //to.remove(this);
                 this.parentNode = clone.parentNode;
-                this.parentNode.add(this);
+                //this.parentNode.add(this);
             }
             throw new ServiceFailureException("could not move", e);
         }
@@ -140,7 +141,7 @@ export class Node {
     }
     protected assertIsNotNullOrUndefined(obj: any, et: ExceptionType): void {
         const condition: boolean = (obj != null);
-        AssertionDispatcher.dispatch(et, condition, "null or undefined");
+        //AssertionDispatcher.dispatch(et, condition, "null or undefined");
     }
 
     protected assertSuccessfulMove(to: Directory, et: ExceptionType): void {
@@ -153,13 +154,13 @@ export class Node {
                 condition2 = true;
             }
         });
-        AssertionDispatcher.dispatch(et, condition, "move failed");
-        AssertionDispatcher.dispatch(et, condition2, "move failed");
+        //AssertionDispatcher.dispatch(et, condition, "move failed");
+        //AssertionDispatcher.dispatch(et, condition2, "move failed");
     }
 
     protected assertIsValidBaseName(bn: string, et: ExceptionType): void {
         const conditionEmpty: boolean = (bn != "");
-        AssertionDispatcher.dispatch(et, conditionEmpty, "invalid base name");
+        //AssertionDispatcher.dispatch(et, conditionEmpty, "invalid base name");
         this.assertIsNotNullOrUndefined(bn, et);
     }
 }

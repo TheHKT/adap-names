@@ -5,13 +5,17 @@ import { Exception } from "./Exception";
  * In other words, a class invariant failed.
  */
 export class InvalidStateException extends Exception {
-  
-    public static assert(c: boolean, m: string = "invalid state", t?: Exception): void {
-        if (!c) throw new InvalidStateException(m, t);
+
+    static assertIsNotNullOrUndefined(o: Object | null, exMsg: string = "null or undefined"): void {
+        this.assertCondition(!this.isNullOrUndefined(o), exMsg);
     }
 
-    constructor(m: string, t?: Exception) {
-        super(m, t);
+    static assertCondition(cond: boolean, exMsg: string): void {
+        if (!cond) throw new InvalidStateException(exMsg);
     }
-    
+
+    constructor(m: string) {
+        super(m);
+    }
+
 }

@@ -5,6 +5,6 @@ function main(args: string[]) {
     service.run(args);
 }
 
-let args: string[] = process.argv;
+let args: string[] = ["process.argv"];
 args = args.slice(2);
 main(args);

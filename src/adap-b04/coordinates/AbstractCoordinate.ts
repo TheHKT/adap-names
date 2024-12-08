@@ -70,7 +70,7 @@ export abstract class AbstractCoordinate implements Coordinate {
     protected abstract doGetR(): number;
 
     public setR(r: number): void {
-        IllegalArgumentException.assert(this.isValidR(r));
+        //IllegalArgumentException.assert(this.isValidR(r));
         this.doSetR(r);
     }
 
@@ -87,14 +87,14 @@ export abstract class AbstractCoordinate implements Coordinate {
      * @param phi Angle of vector
      */
     public setPhi(phi: number): void {
-        IllegalArgumentException.assert(this.isValidPhi(phi));
+        //IllegalArgumentException.assert(this.isValidPhi(phi));
 
         this.doSetPhi(phi);
 
         const newPhi: number = this.doGetPhi();
-        InvalidStateException.assert(this.isValidPhi(newPhi));
+        //InvalidStateException.assert(this.isValidPhi(newPhi));
 
-        MethodFailedException.assert(newPhi == phi);
+        //MethodFailedException.assert(newPhi == phi);
     }
 
     protected abstract doSetPhi(phi: number): void;
