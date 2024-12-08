@@ -51,7 +51,7 @@ export abstract class AbstractName implements Name, Cloneable {
             // PRE
             this.assertValidDelimiter(ExceptionType.PRECONDITION, delimiter);
 
-            let str: string[] = this.doGetComponents().slice();
+            let str: string[] = this.doGetComponentsFr().slice();
             let length: number = this.getNoComponents();
             for (let i: number = 0; i < length; i++) {
                 str[i] = this.removeEscapeCharacters(str[i], delimiter);
@@ -137,7 +137,7 @@ export abstract class AbstractName implements Name, Cloneable {
         }
     }
 
-    private doGetComponents(): string[] {
+    private doGetComponentsFr(): string[] {
         let str: string[] = [];
         let length: number = this.getNoComponents();
 
@@ -187,7 +187,7 @@ export abstract class AbstractName implements Name, Cloneable {
 
     public isEmpty(): boolean {
         try {
-            let flag: boolean = this.doGetComponents().length === 0;
+            let flag: boolean = this.doGetComponentsFr().length === 0;
 
             // CLASS INV
             this.ensureInvariants();
